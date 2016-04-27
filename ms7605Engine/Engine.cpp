@@ -1,12 +1,9 @@
 #include "Engine.h"
-#include <iostream>
-#include <memory>
 
 Engine::Engine() {}
 
 Engine::~Engine() {
-	//delete GLFWwindowPtr;
-	glDeleteTextures(1, &texID);
+	//glDeleteTextures(1, &texID);
 }
 
 bool Engine::init() {
@@ -29,165 +26,119 @@ bool Engine::init() {
 		glfwTerminate();
 		return false;
 	}
+
 	return true;
 }
 
-bool Engine::addObject(std::shared_ptr<Character2D> obj) {
-	objects.push_back(obj);
-	//float lx, ux, ly, uy;
-	//lx = obj.trans.loc.x - obj.trans.size.x / 2;
-	//ux = obj.trans.loc.x - obj.trans.size.x / 2;
-	//ly = obj.trans.loc.x - obj.trans.size.x / 2;
-	//uy = obj.trans.loc.x - obj.trans.size.x / 2;
 
-	std::vector<glm::vec3> locs = {
-		{ 0., 1., 0.0 }, //0
-		{ 0., 0., 0.0 }, //1 - 1
-		{ 1., 0., 0.0 }, //2 - 2
-		{ 1., 1., 0.0 } //3 - 3
-	};
-
-	// Define location data for a star
-	std::vector<unsigned int> locInds = {
-		0, 1, 3,
-		1, 2, 3
-	};
-	unsigned int vertCount = locInds.size();
-	vertNum.push_back(vertCount);
-	// Duplicate data into single buffer for easier processing
-	std::vector<glm::vec3> vertBufData(vertCount);
-	for (unsigned int i = 0; i < vertCount; i++)
-		vertBufData[i] = locs[locInds[i]];
-
-	// Generate vertex array and buffer
-	glGenVertexArrays(1, &vertArr);
-	glGenBuffers(1, &vertBuf);
-
-	// Bind buffers
-	glBindVertexArray(vertArr);
-	glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
-
-	// Store data in buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertCount,
-		&vertBufData[0], GL_STATIC_DRAW);
-
-	// Describe data to buffer
-	glEnableVertexAttribArray(0); // enable a vertex attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
-
-	// Prepare window and data info
-	glClearColor(0.1, 0.1, 0.5, 0.5); // Sets display-window color to white.
-	return true;
-}
 bool Engine::bufferModel() {
 	// Define objects
-	//std::unique_ptr<Character2D> sky(new Character2D("Images/sky.jpg"),
-		//vec3(0,0,0), vec3(), vec3(1.,1.,1.));
-	//sky->toggle_wrap();
-	//addObject(sky);
+	auto back = std::make_shared<Object2D>();
+	back->set_loc(vec3(-1, 0., 0.2));
+	back->set_dim(vec3(2., 1., 1.));
+	back->set_texture_dir("Images/sky.jpg");
+	back->toggle_wrap();
+	om.addObject("back", std::move(back));
 
-	//Character2D *floor = new Character2D("Images/floor.jpg", 
-		//vec3(0,-1.,0), vec3(), vec3(1., 1., 1.));
-	//floor->toggle_wrap();
-
-	auto floor = std::make_unique<Character2D>();
-	floor->set_loc(vec3(0, -1., 0));
-	floor->set_dim(vec3(1., 1., 1.));
-	floor->set_texture("Images/floor.jpg");
+	auto floor = std::make_shared<Object2D>();
+	floor->set_loc(vec3(-1, -1., 0.2));
+	floor->set_dim(vec3(2., 1., 1.));
+	floor->set_texture_dir("Images/floor.jpg");
 	floor->toggle_wrap();
-	addObject(std::move(floor));
+	om.addObject("floor", std::move(floor));
 	
-	//Player *thief = new Player("Images/thief.png", vec3(0.2, -0.4, 0), vec3(), vec3(1, 1, 1));
-	auto thief = std::make_unique<Player>();
-	thief->set_loc(vec3(0.2, -0.4, 0));
-	thief->set_dim(vec3(1., 1., 1.));
-	thief->set_texture("Images/thief.png");
-	thief->set_behavior(Player::PLAYER);
-	thief->set_max_force(0.15f);
-	thief->set_max_speed(0.1f);
-	thief->set_max_acceleration(0.1f);
-	addObject(std::move(thief));
-	/*
-	Character2D *lord1 = new Character2D("Images/lord.png",
-		vec3(-0.4, -0.4, 0), vec3(), vec3(1, 1, 1));
-	lord1->set_target(thief->loc);
-	lord1->set_behavior(Character2D::SEEK);
-	lord1->set_max_force(0.015);
-	lord1->set_max_speed(0.01);
-	addObject(lord1);
+	auto thief = std::make_shared<Player2D>();
+	thief->set_loc(vec3(0.0, 0.0, 0));
+	thief->set_dim(vec3(0.4, 0.7, 1.0));
+	thief->set_texture_dir("Images/thief.png");
+	thief->set_behavior(Player2D::CONTROLLED);
+	thief->set_label(Player2D::PLAYER);
+	thief->set_bound(Player2D::SQUARE);
+	thief->set_max_force(0.7f);
+	thief->set_max_speed(0.7f);
+	thief->set_max_acceleration(0.3f);
+	om.addObject("thief", std::move(thief));
 
-	Character2D *lord2 = new Character2D("Images/lord2.png",
-		vec3(-0.7, -0.4, 0), vec3(), vec3(1, 1, 1));
-	lord2->set_target(thief->loc);
-	lord2->set_behavior(Character2D::SEEK);
-	lord2->set_max_force(0.02);
-	lord2->set_max_speed(0.015);
-	addObject(lord2);
-	*/
+	auto mes = std::make_shared<Object2D>();
+	mes->set_dim(vec3(0.5, 0.4, 1.0));
+	mes->set_texture_dir("Images/ouch.png");
+	mes->set_invisibility(true);
+	om.addObject("ouch", std::move(mes));
+
+	auto lord1 = std::make_shared<Object2D>();
+	lord1->set_loc(vec3(-0.4, -0.4, 0));
+	lord1->set_dim(vec3(0.4, .6, 1.));
+	lord1->set_texture_dir("Images/lord.png");
+	lord1->set_target(om.objects.at("thief"));
+	lord1->set_behavior(Object2D::SEEK);
+	lord1->set_label(Player2D::ENEMY);
+	lord1->set_bound(Player2D::SQUARE);
+	lord1->set_max_force(0.3f);
+	lord1->set_max_speed(0.2f);
+	om.addObject("lord1", std::move(lord1));
+
+	auto lord2 = std::make_shared<Object2D>();
+	lord2->set_loc(vec3(-0.7, -0.4, 0));
+	lord2->set_dim(vec3(0.6, 0.7, 1.));
+	lord2->set_texture_dir("Images/lord2.png");
+	lord2->set_target(om.objects.at("thief"));
+	lord2->set_behavior(Object2D::SEEK);
+	lord2->set_label(Player2D::ENEMY);
+	lord2->set_bound(Player2D::SQUARE);
+	lord2->set_max_force(0.4f);
+	lord2->set_max_speed(0.3f);
+	om.addObject("lord2",std::move(lord2));
 
 	return true;
 }
 
 bool Engine::gameLoop() {
-	printOnce = true;
+	clock_t oldtime = std::clock();
 	// Game loop; loop until the user closes the window.
 	while (!glfwWindowShouldClose(GLFWwindowPtr)) { // <-- true if window was told to close at last frame
 													// Update physical simulation, draw buffered models, process input/window events
 													// v-- Needed for window events
 													//		- Events queue up during a frame
 													//			* Dragging screen or pressing key
+		clock_t clocks = clock();
+		float time_d = (clocks - oldtime)/(float) CLOCKS_PER_SEC;
+		oldtime = clocks;
+
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		om.checkCollisions();
+
 		// Draw objects
-		//thief.update();
-		for (int i = 0; i < objects.size(); i++) {
-			//texID = i;
-			objects.at(i)->update();
-			Character2D *cur = objects.at(i).get();
-			glm::mat4 trans = glm::translate(glm::mat4(1.0f), cur->loc);
-			glm::mat4 rot = glm::yawPitchRoll(cur->rot.x, cur->rot.y, cur->rot.z);
-			glm::mat4 scale =  glm::scale(cur->dim);
-			cur->owm = trans * rot * scale;
-			glUniformMatrix4fv(1, 1, GL_FALSE, &cur->owm[0][0]);
-			useTexture(cur->texDir, cur->wrap);
-			glBindTexture(GL_TEXTURE_2D, texID);
-			//printOnce = false;
-			glBindVertexArray(vertArr);
-			//glBindTexture(GL_TEXTURE_2D, texID);
-			glDrawArrays(GL_TRIANGLES, 0, vertNum.at(i));
-			// Swaps fron (what sceen displays) and back (what OpenGL draws to) buffers.
-			//glfwSwapBuffers(GLFWwindowPtr);
+		for (iter it = om.objects.begin(); it != om.objects.end(); it++) {
+			GameObject *cur = om.objects.at(it->first).get();
+			if (!cur->invisible) {
+				//texID = i;
+				cur->set_target(om.objects.at("thief"));
+				cur->set_time_d(time_d);
+				cur->update();
+
+				glm::mat4 trans = glm::translate(glm::mat4(1.0f), cur->loc);
+				glm::mat4 rot = glm::yawPitchRoll(cur->rot.x, cur->rot.y, cur->rot.z);
+				glm::mat4 scale = glm::scale(cur->dim);
+				cur->owm = trans * rot * scale;
+				glUniformMatrix4fv(1, 1, GL_FALSE, &cur->owm[0][0]);
+				glUniform1i(3, cur->flip);
+				glBindTexture(GL_TEXTURE_2D, cur->texture);
+				//printOnce = false;
+				glBindVertexArray(om.vertArr);
+				glDrawArrays(GL_TRIANGLES, 0, cur->vert_num); //vertNum.at(i));
+			}
 		}
 
 		// Key input
-		// Esc
 		if (InputManager::press(GLFW_KEY_ESCAPE))
 			glfwSetWindowShouldClose(GLFWwindowPtr, GL_TRUE);
 
-		/*
-		// Mouse Click
-		if (InputManager::press(GLFW_MOUSE_BUTTON_1)) {
-			if (!secondTexture) {
-				useTexture("Images/fire.jpg");
-				secondTexture = true;
-			}
-		}
-		else {
-			if (secondTexture) {
-				useTexture("Images/starfish.jpg");
-				secondTexture = false;
-			}
-		}
-		*/
-		//glBindVertexArray(vertArr);
-		//glBindTexture(GL_TEXTURE_2D, texID);
-		//glDrawArrays(GL_TRIANGLES, 0, 24);
 		// Swaps fron (what sceen displays) and back (what OpenGL draws to) buffers.
 		glfwSwapBuffers(GLFWwindowPtr);
 	}
 	glfwTerminate(); // <- Must be called before engine closes, else memory leaks.
-	//for (Character2D *o : objects)
-		//delete o;
 	return true;
 }
 
@@ -196,10 +147,13 @@ bool Engine::useShaders() {
 	InputManager::init(GLFWwindowPtr);
 
 	// Texture Loading
-	//for (int i = 0; i < objects.size(); i++) {
-		//useTexture(objects.at(i).texDir, objects.at(i).wrap, i);
-	//}
-	//useTexture("Images/starfish.jpg");
+	// Add a map later to avoid loading the same texture multiple times.
+	for (iter it = om.objects.begin(); it != om.objects.end(); it++) {
+		std::string i = it->first;
+		GameObject* current = om.objects.at(it->first).get();
+		current->set_texture(useTexture(current->texDir, current->wrap));
+		//useTexture(om.objects.at(i)->texDir, om.objects.at(i)->wrap);
+	}
 
 	// Shader Loading
 	GLuint index = shader_manager.loadShaders("Shaders/vShader.glsl",
@@ -211,15 +165,15 @@ bool Engine::useShaders() {
 	return false;
 }
 
-void Engine::useTexture(char* texDir, bool wrap) {
+GLuint Engine::useTexture(char* texDir, bool wrap) {
 	FIBITMAP* imagePtr =
 		FreeImage_ConvertTo32Bits(
 			FreeImage_Load(
 				FreeImage_GetFileType(texDir, 0), texDir)
 			);
-
-	glGenTextures(1, &texID); // i used to be 1
-	glBindTexture(GL_TEXTURE_2D, texID);
+	GLuint texture;
+	glGenTextures(1, &texture); // i used to be 1
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glTexImage2D(GL_TEXTURE_2D, 0,
 		GL_SRGB_ALPHA,
@@ -237,4 +191,5 @@ void Engine::useTexture(char* texDir, bool wrap) {
 	FreeImage_Unload(imagePtr);
 	// Unbind when finished uplloading
 	glBindTexture(GL_TEXTURE_2D, 0);
+	return texture;
 }

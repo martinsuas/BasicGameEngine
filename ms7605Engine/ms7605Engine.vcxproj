@@ -153,11 +153,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="GameObject\Character2D.cpp" />
+    <ClCompile Include="GameObject\Object2D.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
-    <ClCompile Include="GameObject\Player.cpp" />
+    <ClCompile Include="GameObject\Player\Player2D.cpp" />
     <ClCompile Include="Input\InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="Util\Utility.cpp" />
   </ItemGroup>
@@ -167,12 +168,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="GameObject\Character2D.h" />
+    <ClInclude Include="GameObject\Object2D.h" />
     <ClInclude Include="GameObject\GameObject.h" />
-    <ClInclude Include="GameObject\Player.h" />
+    <ClInclude Include="GameObject\Player\Player2D.h" />
     <ClInclude Include="Input\InputManager.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Util\Constants.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Util\Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

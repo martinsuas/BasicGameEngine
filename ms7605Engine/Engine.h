@@ -15,25 +15,31 @@
 #include <FreeImage.h>
 #include <vector>
 #include <memory>
+#include <map>
+#include <string>
 #include <stdio.h>
+#include <iostream>
+#include <ctime>
 
 // Engine
 #include "ShaderManager.h"
 #include "Input/InputManager.h"
-#include "GameObject/Character2D.h"
-#include "GameObject/Player.h"
+#include "GameObject/Object2D.h"
+#include "GameObject/Player/Player2D.h"
+#include "ObjectManager.h"
 
 class Engine {
 private:
 	// Creates windows with parameters given. Returns address of the GLFWwindow struct,
 	// or nullptr if it fails to create it.
 	GLFWwindow * GLFWwindowPtr;
+	// Create and binds shaders
 	ShaderManager shader_manager;
-	GLuint vertArr;
-	GLuint vertBuf;
-	GLuint texID;
-	std::vector<unsigned int> vertNum;
-	std::vector<std::shared_ptr<Character2D>> objects;
+	// Create and manages objects
+	ObjectManager om;
+	
+	//std::vector<unsigned int> vertNum;
+	typedef std::map<std::string, std::shared_ptr<GameObject>>::iterator iter;
 	//Player player;
 
 	// Extras
@@ -47,8 +53,7 @@ public:
 	~Engine();
 	bool init();
 	bool bufferModel();
-	bool addObject(std::shared_ptr<Character2D> obj);
 	bool gameLoop();
 	bool useShaders();
-	void useTexture(char* texDir, bool wrap);
+	GLuint useTexture(char* texDir, bool wrap);
 };

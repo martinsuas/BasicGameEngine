@@ -12,6 +12,10 @@ GameObject::GameObject() :
 	mass(1.0f),
 	max_speed(1.0f),
 	max_force(2.0f),
+	time_d(1.0f),
+	invisible(false),
+	bound(BOUNDLESS),
+	label(BACKGROUND),
 	behavior(STILL)
 {}
 
@@ -26,6 +30,10 @@ GameObject::GameObject(vec3 loc, vec3 rot, vec3 dim) :
 	//right(vec3(forward.z, forward.y, -forward.x)),
 	max_speed(1.0f),
 	max_force(2.0f),
+	time_d(1.0f),
+	invisible(false),
+	bound(BOUNDLESS),
+	label(BACKGROUND),
 	behavior(STILL)
 {}
 
@@ -34,9 +42,11 @@ GameObject::~GameObject() {}
 
 void GameObject::update() {
 	calculateSteeringForces();
-	velocity += acceleration;
+	vec3 velocity_d = acceleration * time_d;
+	velocity += velocity_d;
 	Utility::limit(velocity, max_speed);
-	loc += velocity;
+	vec3 loc_d = velocity * time_d;
+	loc += loc_d;
 	forward = glm::normalize(velocity);
 	//right(vec3(-forward.z, forward.y, -forward.x));
 	acceleration *= 0;
@@ -60,7 +70,7 @@ vec3 GameObject::steer(GameObject::SteeringBehavior bh, vec3 target) {
 		Utility::limit(steer, max_force);
 		return steer;
 	}
-	else if (bh == PLAYER) {
+	else if (bh == CONTROLLED) {
 		return vec3(0);
 	}
 	else { // STILL
@@ -69,4 +79,27 @@ vec3 GameObject::steer(GameObject::SteeringBehavior bh, vec3 target) {
 	}
 }
 
-//void GameObject::calculateSteeringForces() { }
+bool GameObject::collides(GameObject * B) {
+	if (bound == SQUARE && B->bound == SQUARE) {
+		if (loc.x < (B->loc.x + B->dim.x) &&
+			(loc.x + dim.x) > B->loc.x &&
+			loc.y < (B->loc.y + B->dim.y) &&
+			(loc.y + dim.y) > B->loc.y &&
+			loc.z < (B->loc.z + B->dim.z) &&
+			(loc.z + dim.z) > B->loc.z){
+			return true;
+		}
+	}
+	if (bound == SPHERE && B->bound == SPHERE) {
+		float r1, r2;
+		r1 = dim.x / 2;
+		r2 = B->dim.x / 2;
+		if (r1 + r2 > glm::distance(loc, B->loc))
+			return true;
+	}
+
+	//if (bound == SQUARE && B->bound == SPHERE) {
+
+	//}
+	return false;
+}

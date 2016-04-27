@@ -51,3 +51,9 @@ Debug/
 *.sdf
 ms7605Engine.sln
 *.opendb
+*.suo
+*.vcxproj
+*.vcxproj
+*.filters
+*.zip
+ms7605Engine/ms7605Engine.vcxproj

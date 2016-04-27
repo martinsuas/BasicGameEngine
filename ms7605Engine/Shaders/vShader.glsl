@@ -11,9 +11,9 @@ layout (location = 0) in vec3 position;
 
 layout( location = 1) uniform mat4 matrix;
 layout( location = 2) uniform vec2 textureCoord;
-
+layout( location = 3) uniform int flip;
 // Blended variable
-out vec2 fragUV;
+out vec2 color;
 out vec2 texCoord;
 
 void main() {
@@ -24,5 +24,8 @@ void main() {
 //      * Should be set before the sahder ends.
 //  2. position is the first 3 componets.
 	texCoord = textureCoord;
-	fragUV = position.xy;
+	if (flip != 0) {
+		//nada
+	}
+	color = position.xy;
 }

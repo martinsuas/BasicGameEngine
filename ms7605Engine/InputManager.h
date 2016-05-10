@@ -1,3 +1,7 @@
+/*
+Partial credits to this code:
+http://learnopengl.com/#!Getting-started/Camera
+*/
 #pragma once
 #include <GL/glew.h>
 // Great for small program; makes programs more portable, handles windows
@@ -10,7 +14,11 @@
 #include <glm/gtx/transform.hpp>
 #include <FreeImage.h>
 #include <map>
+#include "FreeCamera.h"
 
+
+/*
+*/
 class InputManager {
 public:
 	InputManager();
@@ -22,11 +30,18 @@ public:
 	static void keyCallback(GLFWwindow * windowPtr, int key,
 		int scancode, int action, int mods);
 
+	static void mouseCallback(GLFWwindow * windowPtr, double xpos, double ypos);
 
-	static void init(GLFWwindow* windowPtr);
+	static void scrollCallback(GLFWwindow * window, double xoff, double yoff);
+
+
+	static void init(GLFWwindow* windowPtr, int width, int height, FreeCamera &cam);
 
 	static bool press(int key);
 
 private:
 	static std::map<int, bool> keyDown;
+	static bool firstMouse;
+	static GLfloat lastX, lastY;
+	static FreeCamera* cam;
 };

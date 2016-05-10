@@ -1,6 +1,7 @@
 #pragma once
-#include "../Object2D.h"
-#include "../../Input/InputManager.h"
+#include "Object2D.h"
+#include "InputManager.h"
+
 class Player2D : public Object2D {
 public:
 	//InputManager im;
@@ -12,6 +13,7 @@ public:
 
 	virtual void calculateSteeringForces();
 	void set_max_acceleration(const float a);
+	//Camera get_camera();
 };
 
 inline void Player2D::set_max_acceleration(const float a) {

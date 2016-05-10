@@ -152,30 +152,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FollowingCamera.cpp" />
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="GameObject\Object2D.cpp" />
-    <ClCompile Include="GameObject\GameObject.cpp" />
-    <ClCompile Include="GameObject\Player\Player2D.cpp" />
-    <ClCompile Include="Input\InputManager.cpp" />
+    <ClCompile Include="FreeCamera.cpp" />
+    <ClCompile Include="Object2D.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Player2D.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
-    <ClCompile Include="Util\Utility.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fShader.glsl" />
     <None Include="Shaders\vShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FollowingCamera.h" />
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="GameObject\Object2D.h" />
-    <ClInclude Include="GameObject\GameObject.h" />
-    <ClInclude Include="GameObject\Player\Player2D.h" />
-    <ClInclude Include="Input\InputManager.h" />
+    <ClInclude Include="FreeCamera.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Object2D.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Player2D.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="ShaderManager.h" />
-    <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="ObjectManager.h" />
-    <ClInclude Include="Util\Utility.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

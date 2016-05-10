@@ -18,8 +18,8 @@ Object2D::~Object2D() {
 }
 
 void Object2D::calculateSteeringForces() {
-	if (has_target) {
-		vec3 steering_force = steer(behavior, target->loc);
-		acceleration += (steering_force / mass);	
-	}
+	//if (has_target) {
+		//vec3 steering_force = steer(behavior, target->loc);
+		//acceleration += (steering_force / mass);	
+	//}
 }

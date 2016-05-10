@@ -2,8 +2,9 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
-#include "../Util/Utility.h"
+#include "Utility.h"
 #include <memory>
+#include <string>
 using glm::vec3;
 
 class GameObject {
@@ -11,9 +12,10 @@ public:
 	enum SteeringBehavior { STILL, SEEK, CONTROLLED };
 	enum Label { PLAYER, BACKGROUND, ENEMY };
 	enum Bound { SQUARE, SPHERE, BOUNDLESS};
-	GameObject();
+	
 	GameObject(vec3 loc, vec3 rot, vec3 dim);
-	~GameObject( );
+	GameObject();
+	~GameObject();
 
 	vec3 steer(SteeringBehavior bh, vec3 target = vec3());
 
@@ -22,8 +24,15 @@ public:
 	void applyForce(const vec3 force);
 	void deaccelerate();
 	bool collides(GameObject* go);
+	bool buffer(std::string objfile);
+	bool buffer();
+	bool render();
 
-	// Set functions
+	// Vectors and Physics
+	vec3 loc, rot, dim, velocity, acceleration, forward;// , right;
+	glm::mat4 owm; // object world matrix
+	float mass, max_speed, max_force, time_d;
+
 	void set_loc(const vec3 loc);
 	void set_rot(const vec3 rot);
 	void set_dim(const vec3 dim);
@@ -32,31 +41,40 @@ public:
 	void set_mass(const float mass);
 	void set_max_speed(const float speed);
 	void set_max_force(const float force);
-	void set_behavior(SteeringBehavior bh);
-	void set_label(Label label);
-	void set_vert_num(const unsigned int num);
-	void set_target(std::shared_ptr<GameObject> go);
-	void set_bound(Bound bound);
-	void set_texture(GLuint texture);
-	void set_texture_dir(char* texdir);
 	void set_time_d(float time_d);
-	void forget_target();
-	void toggle_wrap();
-	void set_invisibility(const bool invisibility);
-	void set_flip(const bool flip);
 
-//protected:
-	vec3 loc, rot, dim, velocity, acceleration, forward;// , right;
-	glm::mat4 owm; // object world matrix
-	float mass, max_speed, max_force, time_d;
-	unsigned int vert_num;
+	// Classification
 	SteeringBehavior behavior;
 	Label label;
 	Bound bound;
+	std::shared_ptr<GameObject> target;
+	bool has_target;
+
+	void set_behavior(SteeringBehavior bh);
+	void set_label(Label label);
+	void set_bound(Bound bound);
+	void set_target(std::shared_ptr<GameObject> go);
+	void forget_target();
+
+	// Textures
 	GLuint texture;
 	char* texDir;
-	std::shared_ptr<GameObject> target;
-	bool has_target, wrap, invisible, flip;
+	bool  wrap, invisible, flip;
+
+	void set_texture(GLuint texture);
+	void set_texture_dir(char* texdir);
+	void toggle_wrap();
+	void set_invisibility(const bool invisibility);
+	void set_flip(const bool flip);
+	
+
+	// Object files and object's vertices
+	GLuint vertArr;
+	GLuint vertBuf;
+	unsigned int vertCount;
+	//std::string objfile;
+
+	//void set_objfile(std::string objfile);
 };
 
 inline void GameObject::set_loc(const vec3 _loc) {
@@ -99,9 +117,6 @@ inline void GameObject::set_bound(const Bound _bound) {
 	bound = _bound;
 }
 
-inline void GameObject::set_vert_num(const unsigned int _vert_num) {
-	vert_num = _vert_num;
-}
 
 inline void GameObject::set_target(std::shared_ptr<GameObject> go) {
 	target = go;
@@ -112,9 +127,6 @@ inline void GameObject::set_texture_dir(char* textdir) {
 	texDir = textdir;
 }
 
-inline void GameObject::set_texture(GLuint _texture) {
-	texture = _texture;
-}
 
 inline void GameObject::forget_target() {
 	has_target = false;
@@ -139,3 +151,11 @@ inline void GameObject::set_invisibility(const bool _invisible) {
 inline void GameObject::set_flip(const bool _flip) {
 	flip = _flip;
 }
+
+inline void GameObject::set_texture(GLuint _texture) {
+	texture = _texture;
+}
+
+//inline void GameObject::set_objfile(std::string _objfile) {
+	//objfile = _objfile;
+//}

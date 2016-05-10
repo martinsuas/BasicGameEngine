@@ -23,10 +23,16 @@
 
 // Engine
 #include "ShaderManager.h"
-#include "Input/InputManager.h"
-#include "GameObject/Object2D.h"
-#include "GameObject/Player/Player2D.h"
+#include "InputManager.h"
+#include "Model.h"
+// GameObjects
+#include "Object2D.h"
+#include "Player2D.h"
 #include "ObjectManager.h"
+// Cameras
+#include "Camera.h"
+#include "FollowingCamera.h"
+#include "FreeCamera.h"
 
 class Engine {
 private:
@@ -37,6 +43,8 @@ private:
 	ShaderManager shader_manager;
 	// Create and manages objects
 	ObjectManager om;
+	// Default view
+	FreeCamera camera;
 	
 	//std::vector<unsigned int> vertNum;
 	typedef std::map<std::string, std::shared_ptr<GameObject>>::iterator iter;

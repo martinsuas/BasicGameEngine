@@ -1,5 +1,5 @@
 #pragma once
-#include "GameObject/GameObject.h"
+#include "GameObject.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>

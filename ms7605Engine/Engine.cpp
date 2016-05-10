@@ -1,4 +1,6 @@
 #include "Engine.h"
+const int WIDTH = 1280;
+const int HEIGHT = 900;
 
 Engine::Engine() {}
 
@@ -10,7 +12,7 @@ bool Engine::init() {
 	// Initializes GLFW
 	if (glfwInit() == GL_FALSE)
 		return false;
-	GLFWwindowPtr = glfwCreateWindow(1280, 900, "ms7605 DSA1 Engine",
+	GLFWwindowPtr = glfwCreateWindow(WIDTH, HEIGHT, "ms7605 DSA1 Engine",
 		NULL, NULL);
 
 	// Make our pointer the currently active window, else quit
@@ -26,25 +28,32 @@ bool Engine::init() {
 		glfwTerminate();
 		return false;
 	}
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LEQUAL);
 	return true;
 }
 
 
 bool Engine::bufferModel() {
+	// Input loader
+	InputManager::init(GLFWwindowPtr, WIDTH, HEIGHT, camera);
+
 	// Define objects
 	auto back = std::make_shared<Object2D>();
-	back->set_loc(vec3(-1, 0., 0.2));
-	back->set_dim(vec3(2., 1., 1.));
+	back->set_loc(vec3(-1, 0., -0.2));
+	back->set_dim(vec3(2., 1., -1.));
 	back->set_texture_dir("Images/sky.jpg");
 	back->toggle_wrap();
+	back->buffer("Models/sphere.obj");
 	om.addObject("back", std::move(back));
-
+	/*
 	auto floor = std::make_shared<Object2D>();
-	floor->set_loc(vec3(-1, -1., 0.2));
-	floor->set_dim(vec3(2., 1., 1.));
+	floor->set_loc(vec3(-1, -1., -0.2));
+	floor->set_dim(vec3(2., 1., -1.));
 	floor->set_texture_dir("Images/floor.jpg");
 	floor->toggle_wrap();
+	floor->buffer("Models/sphere.obj");
 	om.addObject("floor", std::move(floor));
 	
 	auto thief = std::make_shared<Player2D>();
@@ -57,12 +66,14 @@ bool Engine::bufferModel() {
 	thief->set_max_force(0.7f);
 	thief->set_max_speed(0.7f);
 	thief->set_max_acceleration(0.3f);
+	thief->buffer();
 	om.addObject("thief", std::move(thief));
 
 	auto mes = std::make_shared<Object2D>();
 	mes->set_dim(vec3(0.5, 0.4, 1.0));
 	mes->set_texture_dir("Images/ouch.png");
 	mes->set_invisibility(true);
+	mes->buffer();
 	om.addObject("ouch", std::move(mes));
 
 	auto lord1 = std::make_shared<Object2D>();
@@ -75,6 +86,7 @@ bool Engine::bufferModel() {
 	lord1->set_bound(Player2D::SQUARE);
 	lord1->set_max_force(0.3f);
 	lord1->set_max_speed(0.2f);
+	lord1->buffer();
 	om.addObject("lord1", std::move(lord1));
 
 	auto lord2 = std::make_shared<Object2D>();
@@ -87,13 +99,23 @@ bool Engine::bufferModel() {
 	lord2->set_bound(Player2D::SQUARE);
 	lord2->set_max_force(0.4f);
 	lord2->set_max_speed(0.3f);
-	om.addObject("lord2",std::move(lord2));
-
+	lord2->buffer();
+	om.addObject("lord2", std::move(lord2));
+	*/
+	// Define view
+	camera = FreeCamera(WIDTH, HEIGHT);
+	camera.set_camera(
+		vec3(0.0f, 0.0f, 2.f),
+		vec3(0.0f, 0.0f, -1.0f),
+		vec3(0.0f, 1.0f, 0.0f)
+		);
+	camera.is_ortho(false);
 	return true;
 }
 
 bool Engine::gameLoop() {
 	clock_t oldtime = std::clock();
+	camera.update();
 	// Game loop; loop until the user closes the window.
 	while (!glfwWindowShouldClose(GLFWwindowPtr)) { // <-- true if window was told to close at last frame
 													// Update physical simulation, draw buffered models, process input/window events
@@ -107,27 +129,36 @@ bool Engine::gameLoop() {
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		om.checkCollisions();
+		//om.checkCollisions();
 
 		// Draw objects
 		for (iter it = om.objects.begin(); it != om.objects.end(); it++) {
 			GameObject *cur = om.objects.at(it->first).get();
 			if (!cur->invisible) {
-				//texID = i;
-				cur->set_target(om.objects.at("thief"));
+				//cur->set_target(om.objects.at("thief"));
 				cur->set_time_d(time_d);
 				cur->update();
 
 				glm::mat4 trans = glm::translate(glm::mat4(1.0f), cur->loc);
 				glm::mat4 rot = glm::yawPitchRoll(cur->rot.x, cur->rot.y, cur->rot.z);
 				glm::mat4 scale = glm::scale(cur->dim);
-				cur->owm = trans * rot * scale;
-				glUniformMatrix4fv(1, 1, GL_FALSE, &cur->owm[0][0]);
-				glUniform1i(3, cur->flip);
+				cur->owm = camera.get_proj() * camera.get_view()
+					* trans * rot * scale;
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(shader_manager.getProgram(), "matrix"),
+					1, GL_FALSE, &cur->owm[0][0]
+				);
+				
+				glUniform1i(glGetUniformLocation(shader_manager.getProgram(), "flip"),
+					cur->flip);
+
+				//glUniformMatrix4fv(1, 1, GL_FALSE, &cur->owm[0][0]);
+				//glUniform1i(3, cur->flip);
+
 				glBindTexture(GL_TEXTURE_2D, cur->texture);
 				//printOnce = false;
-				glBindVertexArray(om.vertArr);
-				glDrawArrays(GL_TRIANGLES, 0, cur->vert_num); //vertNum.at(i));
+				cur->render();
 			}
 		}
 
@@ -143,16 +174,12 @@ bool Engine::gameLoop() {
 }
 
 bool Engine::useShaders() {
-	// Input loader
-	InputManager::init(GLFWwindowPtr);
-
 	// Texture Loading
 	// Add a map later to avoid loading the same texture multiple times.
 	for (iter it = om.objects.begin(); it != om.objects.end(); it++) {
 		std::string i = it->first;
 		GameObject* current = om.objects.at(it->first).get();
 		current->set_texture(useTexture(current->texDir, current->wrap));
-		//useTexture(om.objects.at(i)->texDir, om.objects.at(i)->wrap);
 	}
 
 	// Shader Loading

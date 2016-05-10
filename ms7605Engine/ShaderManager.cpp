@@ -75,7 +75,6 @@ GLuint ShaderManager::loadShader(const char* file, GLenum shaderType) {
 	// 1. index of shader
 	// 2. Which info to get? In this case, GL_COMPILE_STATUS
 	// 3. 0 is failure
-
 	delete[] contents;
 	GLint result;
 

@@ -1,0 +1,15 @@
+UP - Move thief up
+DOWN - Move thief down
+LEFT - Move thief left
+RIGHT - Move thief right
+
+=Camera=
+W - Move forward
+S - Move backwards
+A - Move left
+D - Move right
+E - Move up
+Q - Move down
+
+Mouse Location - Pitch Yaw Rotation
+Mouse wheel - Zoom in and out
